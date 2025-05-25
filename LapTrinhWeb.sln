@@ -5,6 +5,10 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloneWeb", "CloneWeb\CloneWeb.csproj", "{EFA58C4D-F768-445E-A454-D0DE8699E2DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buoi5", "Buoi5\Buoi5.csproj", "{EF28C73C-6671-4F31-A595-07BACACA5601}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buoi3", "Buoi3\Buoi3.csproj", "{084611EF-7F4A-4B2D-90BB-34083FF719F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{EFA58C4D-F768-445E-A454-D0DE8699E2DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFA58C4D-F768-445E-A454-D0DE8699E2DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFA58C4D-F768-445E-A454-D0DE8699E2DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF28C73C-6671-4F31-A595-07BACACA5601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF28C73C-6671-4F31-A595-07BACACA5601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF28C73C-6671-4F31-A595-07BACACA5601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF28C73C-6671-4F31-A595-07BACACA5601}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084611EF-7F4A-4B2D-90BB-34083FF719F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084611EF-7F4A-4B2D-90BB-34083FF719F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084611EF-7F4A-4B2D-90BB-34083FF719F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084611EF-7F4A-4B2D-90BB-34083FF719F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,86 @@
+﻿@model Buoi5.Models.Student
+<link rel="stylesheet" href="~/css/student.css" asp-append-version="true" />
+
+<div class="container">
+    <h2>Thêm học sinh</h2>
+    <div id="errorMessages" style="color: red; margin-bottom: 15px;"></div>
+    <form asp-action="Create" method="post" id="createForm">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <label asp-for="FirstName">Họ</label>
+            <input asp-for="FirstName" class="form-control" required />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LastName">Tên</label>
+            <input asp-for="LastName" class="form-control" required />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="GradeId">Lớp</label>
+            <select asp-for="GradeId" class="form-control" asp-items="@(new SelectList(ViewBag.Grades, "GradeId", "GradeName"))" required>
+                <option value="">Chọn lớp</option>
+            </select>
+            <span asp-validation-for="GradeId" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Lưu</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            var form = $("#createForm");
+            var submitBtn = $("#submitBtn");
+            var isSubmitting = false;
+
+            $("#GradeId").change(function () {
+                console.log("Selected GradeId: " + $(this).val());
+            });
+
+            form.on("submit", function (event) {
+                event.preventDefault();
+                if (isSubmitting) return;
+
+                console.log("Create form submission started");
+                console.log("Form data: ", form.serialize());
+
+                if (!form.valid()) {
+                    console.log("Validation failed on client-side");
+                    $("#errorMessages").html("<p>Vui lòng kiểm tra các trường bắt buộc.</p>");
+                    return;
+                }
+
+                isSubmitting = true;
+                submitBtn.prop("disabled", true).text("Đang lưu...");
+
+                $.ajax({
+                    url: form.attr("action"),
+                    type: form.attr("method"),
+                    data: form.serialize(),
+                    dataType: "json",
+                    success: function (response) {
+                        console.log("AJAX success: ", response);
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            $("#errorMessages").html("<p>" + response.message + "</p><ul>" + response.errors.map(e => "<li>" + e + "</li>").join("") + "</ul>");
+                            submitBtn.prop("disabled", false).text("Lưu");
+                            isSubmitting = false;
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX error: ", status, error);
+                        $("#errorMessages").html("<p>Có lỗi xảy ra: " + error + "</p>");
+                        submitBtn.prop("disabled", false).text("Lưu");
+                        isSubmitting = false;
+                    }
+                });
+            });
+        });
+    </script>
+}

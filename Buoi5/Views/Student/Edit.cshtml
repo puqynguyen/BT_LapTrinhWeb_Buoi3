@@ -1,0 +1,95 @@
+﻿@model Buoi5.Models.Student
+<link rel="stylesheet" href="~/css/student.css" asp-append-version="true" />
+
+<div class="container">
+    <h2>Sửa thông tin học sinh</h2>
+    <div id="errorMessages" style="color: red; margin-bottom: 15px;"></div>
+    <form asp-action="Edit" method="post" id="editForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="StudentId" />
+        <div class="form-group">
+            <label asp-for="FirstName">Họ</label>
+            <input asp-for="FirstName" class="form-control" required />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LastName">Tên</label>
+            <input asp-for="LastName" class="form-control" required />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="GradeId">Lớp</label>
+            <select asp-for="GradeId" class="form-control" asp-items="@(new SelectList(ViewBag.Grades, "GradeId", "GradeName", Model.GradeId))" required>
+                <option value="">Chọn lớp</option>
+            </select>
+            <span asp-validation-for="GradeId" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Lưu</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            var form = $("#editForm");
+            var submitBtn = $("#submitBtn");
+            var isSubmitting = false;
+
+            console.log("Initial GradeId: " + $("#GradeId").val());
+
+            $("#GradeId").change(function () {
+                console.log("Selected GradeId: " + $(this).val());
+            });
+
+            form.off("submit");
+            form.on("submit", function (event) {
+                event.preventDefault();
+                if (isSubmitting) {
+                    console.log("Form is already being submitted, ignoring...");
+                    return;
+                }
+
+                console.log("Edit form submission started");
+                console.log("Form data before submission: ", form.serialize());
+
+                if (!form.valid()) {
+                    console.log("Validation failed on client-side");
+                    $("#errorMessages").html("<p>Vui lòng kiểm tra các trường bắt buộc.</p>");
+                    return;
+                }
+
+                isSubmitting = true;
+                submitBtn.prop("disabled", true).text("Đang lưu...");
+                console.log("Sending AJAX request...");
+
+                $.ajax({
+                    url: form.attr("action"),
+                    type: form.attr("method"),
+                    data: form.serialize(),
+                    dataType: "json",
+                    success: function (response) {
+                        console.log("AJAX success: ", response);
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            $("#errorMessages").html("<p>" + response.message + "</p><ul>" + response.errors.map(e => "<li>" + e + "</li>").join("") + "</ul>");
+                            submitBtn.prop("disabled", false).text("Lưu");
+                            isSubmitting = false;
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX error: ", status, error);
+                        console.error("Response: ", xhr.responseText);
+                        $("#errorMessages").html("<p>Có lỗi xảy ra khi lưu học sinh: " + error + "</p>");
+                        submitBtn.prop("disabled", false).text("Lưu");
+                        isSubmitting = false;
+                    }
+                });
+            });
+        });
+    </script>
+}

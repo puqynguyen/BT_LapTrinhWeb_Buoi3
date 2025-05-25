@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Kết quả đăng ký";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Kết quả đăng ký chuyên ngành</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success mt-4" role="alert">
+            @TempData["Message"]
+        </div>
+    }
+
+    <div class="alert alert-success mt-4" role="alert">
+        Cảm ơn bạn <strong>@ViewBag.MSSV - @ViewBag.HoTen</strong> đã đăng ký chuyên ngành <strong>@ViewBag.ChuyenNganh</strong>.
+    </div>
+    <div class="alert alert-info mt-3" role="alert">
+        Số lượng sinh viên đã đăng ký ngành giống bạn là: <strong>@ViewBag.SoLuongCungNganh</strong>.
+    </div>
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-primary me-2">Đăng ký thêm</a>
+        <a asp-action="List" class="btn btn-secondary">Xem danh sách sinh viên</a>
+    </div>
+</div>

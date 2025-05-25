@@ -1,0 +1,14 @@
+﻿@model Buoi5.Models.Student
+<link rel="stylesheet" href="~/css/student.css" />
+
+<div class="container">
+    <h2>Chi tiết học sinh</h2>
+    <div class="details-box">
+        <p><strong>Họ và tên:</strong> @Model.FirstName @Model.LastName</p>
+        <p><strong>Lớp:</strong> @Model.Grade?.GradeName</p>
+    </div>
+    <p>
+        <a asp-action="Edit" asp-route-id="@Model.StudentId" class="btn btn-primary">Sửa</a>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </p>
+</div>

@@ -1,0 +1,41 @@
+﻿@model List<buoi1C5.Models.Student>
+
+@{
+    ViewData["Title"] = "Danh sách sinh viên đã đăng ký";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Danh sách sinh viên đã đăng ký</h2>
+    @if (Model.Any())
+    {
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>MSSV</th>
+                    <th>Họ tên</th>
+                    <th>Điểm TB</th>
+                    <th>Chuyên ngành</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr>
+                        <td>@student.MSSV</td>
+                        <td>@student.HoTen</td>
+                        <td>@student.DiemTB</td>
+                        <td>@student.ChuyenNganh</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-center mt-4">Chưa có sinh viên nào đăng ký.</p>
+    }
+
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-primary">Đăng ký thêm</a>
+    </div>
+</div>

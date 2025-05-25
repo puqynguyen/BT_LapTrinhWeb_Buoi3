@@ -1,0 +1,16 @@
+﻿@model Buoi5.Models.Student
+<link rel="stylesheet" href="~/css/student.css" />
+
+<div class="container">
+    <h2>Xóa học sinh</h2>
+    <div class="details-box">
+        <p><strong>Họ và tên:</strong> @Model.FirstName @Model.LastName</p>
+        <p><strong>Lớp:</strong> @Model.Grade?.GradeName</p>
+    </div>
+    <p>Bạn có chắc muốn xóa học sinh này?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="StudentId" />
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>

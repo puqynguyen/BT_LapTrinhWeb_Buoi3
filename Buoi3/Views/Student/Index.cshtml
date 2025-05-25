@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Đăng ký chuyên ngành";
+}
+@model buoi1C5.Models.Student
+
+@{
+    ViewData["Title"] = "Đăng ký chuyên ngành";
+}
+<div class="container mt-5">
+    <h2 class="text-center">Đăng ký chuyên ngành - Khoa CNTT</h2>
+    <form asp-action="Index" method="post" class="mt-4">
+        <div class="form-group mb-3">
+            <label asp-for="MSSV" class="form-label">MSSV</label>
+            <input asp-for="MSSV" class="form-control" required />
+            <span asp-validation-for="MSSV" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="HoTen" class="form-label">Họ tên</label>
+            <input asp-for="HoTen" class="form-control" required />
+            <span asp-validation-for="HoTen" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="DiemTB" class="form-label">Điểm TB</label>
+            <input asp-for="DiemTB" class="form-control" type="number" step="0.1" min="0" max="10" required />
+            <span asp-validation-for="DiemTB" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="ChuyenNganh" class="form-label">Chuyên ngành</label>
+            <select asp-for="ChuyenNganh" class="form-control" required>
+                <option value="">-- Chọn chuyên ngành --</option>
+                <option value="CNPM">CNPM</option>
+                <option value="HTTT">HTTT</option>
+                <option value="ANM">ANM</option>
+                <option value="TTNT">TTNT</option>
+                <option value="MMT">MMT</option>
+            </select>
+            <span asp-validation-for="ChuyenNganh" class="text-danger"></span>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Đăng ký</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

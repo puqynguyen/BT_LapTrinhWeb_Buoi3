@@ -1,0 +1,26 @@
+[
+  {
+    "MSSV": "111",
+    "HoTen": "quan",
+    "DiemTB": "1",
+    "ChuyenNganh": "ANM"
+  },
+  {
+    "MSSV": "222",
+    "HoTen": "qu",
+    "DiemTB": "1",
+    "ChuyenNganh": "HTTT"
+  },
+  {
+    "MSSV": "333",
+    "HoTen": "q",
+    "DiemTB": "5",
+    "ChuyenNganh": "ANM"
+  },
+  {
+    "MSSV": "444",
+    "HoTen": "quan",
+    "DiemTB": "6",
+    "ChuyenNganh": "ANM"
+  }
+]

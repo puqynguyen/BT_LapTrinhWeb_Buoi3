@@ -1,0 +1,30 @@
+﻿@model List<Buoi5.Models.Student>
+<link rel="stylesheet" href="~/css/student.css" />
+
+<div class="container">
+    <h2>Danh sách học sinh</h2>
+    <p><a asp-action="Create" class="btn btn-primary">Thêm học sinh</a></p>
+    <table class="student-table">
+        <thead>
+            <tr>
+                <th>Họ và tên</th>
+                <th>Lớp</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.FirstName @student.LastName</td>
+                    <td>@student.Grade?.GradeName</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@student.StudentId">Chi tiết</a> |
+                        <a asp-action="Edit" asp-route-id="@student.StudentId">Sửa</a> |
+                        <a asp-action="Delete" asp-route-id="@student.StudentId">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
