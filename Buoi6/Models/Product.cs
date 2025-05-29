@@ -15,13 +15,16 @@ namespace Buoi6.Models
         [Required(ErrorMessage = "Giá sản phẩm không được để trống, tối thiểu 1.000 đến 1.000.000")]
         public decimal Price { get; set; }
 
+        [Required(ErrorMessage = "Mô tả sản phẩm là bắt buộc")]
         public string Description { get; set; }
 
+        // Bỏ Required cho ImageUrl vì sẽ được gán trong controller
         public string? ImageUrl { get; set; }
 
         public List<ProductImage> Images { get; set; }
 
         [DisplayName("Danh mục")]
+        [Required(ErrorMessage = "Vui lòng chọn danh mục")]
         public int CategoryId { get; set; }
 
         [DisplayName("Danh mục")]
