@@ -10,17 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// File upload limits
+// Configure file upload limits
 builder.Services.Configure<IISServerOptions>(options =>
 {
     options.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 
+// Configure Kestrel server
 builder.Services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
 {
     options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 
+// Configure form options
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
     options.ValueLengthLimit = int.MaxValue;
@@ -28,15 +30,14 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(optio
     options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
-// Database connection
+// Connect to DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Repositories
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
-// Identity configuration
+// Configure Identity with ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 6;
@@ -50,17 +51,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Configure cookie authentication
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Login";
     options.AccessDeniedPath = "/AccessDenied";
 });
 
-// Enable Razor Pages
 builder.Services.AddRazorPages();
 
-// Add detailed logging
 builder.Services.AddLogging(logging =>
 {
     logging.AddConsole();
@@ -84,8 +82,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline
-if (!app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -98,13 +100,16 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
+// MVC routes first
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller}/{action=Index}/{id?}");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Razor Pages for specific routes
+app.MapRazorPages();
 
 app.Run();
 
@@ -112,7 +117,9 @@ async Task CreateRolesAndUsers(IServiceProvider serviceProvider)
 {
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var dbContext = serviceProvider.GetRequiredService<ApplicationDbContext>();
 
+    // Create roles
     string[] roleNames = { "Admin", "Member" };
     foreach (var roleName in roleNames)
     {
@@ -122,6 +129,7 @@ async Task CreateRolesAndUsers(IServiceProvider serviceProvider)
         }
     }
 
+    // Create admin user
     var adminEmail = "admin@example.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
@@ -141,6 +149,7 @@ async Task CreateRolesAndUsers(IServiceProvider serviceProvider)
         }
     }
 
+    // Create member user
     var memberEmail = "member@example.com";
     var memberUser = await userManager.FindByEmailAsync(memberEmail);
     if (memberUser == null)
@@ -158,5 +167,16 @@ async Task CreateRolesAndUsers(IServiceProvider serviceProvider)
         {
             await userManager.AddToRoleAsync(memberUser, "Member");
         }
+    }
+
+    // Seed categories
+    if (!await dbContext.Categories.AnyAsync())
+    {
+        dbContext.Categories.AddRange(
+            new Category { Name = "Điện thoại" },
+            new Category { Name = "Laptop" },
+            new Category { Name = "Phụ kiện" }
+        );
+        await dbContext.SaveChangesAsync();
     }
 }

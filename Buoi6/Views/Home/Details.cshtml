@@ -1,0 +1,77 @@
+﻿@model Buoi6.Models.Product
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container my-4">
+    <h2>Chi tiết sản phẩm</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="product-images">
+                <!-- Main Image -->
+                <div class="main-image mb-3">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-height: 400px; width: auto;" />
+                    }
+                    else
+                    {
+                        <div class="no-image p-5 bg-light text-center rounded">
+                            <i class="bi bi-image" style="font-size: 5rem;"></i>
+                            <p class="mt-3">Không có hình ảnh chính</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Additional Images -->
+                @if (Model.Images != null && Model.Images.Any())
+                {
+                    <div class="additional-images">
+                        <h5>Hình ảnh bổ sung</h5>
+                        <div class="row">
+                            @foreach (var image in Model.Images)
+                            {
+                                <div class="col-4 col-md-3 mb-3">
+                                    <img src="@image.Url" alt="Additional Image" class="img-thumbnail" style="height: 120px; object-fit: cover;" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Chưa có hình ảnh bổ sung.</p>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h1 class="mb-3">@Model.Name</h1>
+            <h3 class="text-danger mb-4">@Model.Price.ToString("N0") VNĐ</h3>
+
+            @if (Model.Category != null)
+            {
+                <p class="mb-3">
+                    <span class="badge bg-primary">@Model.Category.Name</span>
+                </p>
+            }
+
+            <div class="description mb-4">
+                <h5>Mô tả sản phẩm</h5>
+                <p>@Model.Description</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Trở lại danh sách
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+}

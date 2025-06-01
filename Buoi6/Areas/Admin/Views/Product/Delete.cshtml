@@ -1,0 +1,56 @@
+﻿@model Buoi6.Models.Product
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Xóa sản phẩm";
+}
+
+<div class="container mt-4">
+    <h2>Xóa sản phẩm</h2>
+    <div class="alert alert-danger">
+        <h4>Bạn có chắc muốn xóa sản phẩm <strong>@Model.Name</strong>?</h4>
+        <p>Hành động này không thể hoàn tác. Tất cả hình ảnh liên quan cũng sẽ bị xóa.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-2">Tên</dt>
+                <dd class="col-sm-10">@Model.Name</dd>
+                <dt class="col-sm-2">Giá</dt>
+                <dd class="col-sm-10">@Model.Price.ToString("N0") VNĐ</dd>
+                <dt class="col-sm-2">Mô tả</dt>
+                <dd class="col-sm-10">@Model.Description</dd>
+                <dt class="col-sm-2">Danh mục</dt>
+                <dd class="col-sm-10">@Model.Category?.Name</dd>
+                <dt class="col-sm-2">Hình ảnh chính</dt>
+                <dd class="col-sm-10">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-thumbnail" style="max-height: 100px;" />
+                    }
+                    else
+                    {
+                        <span>Không có</span>
+                    }
+                </dd>
+            </dl>
+
+            <form asp-action="DeleteConfirmed" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Xóa
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+}

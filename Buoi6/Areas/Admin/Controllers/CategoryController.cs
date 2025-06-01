@@ -3,6 +3,7 @@ using Buoi6.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Buoi6.Areas.Admin.Controllers
 {
@@ -12,11 +13,13 @@ namespace Buoi6.Areas.Admin.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IProductRepository _productRepository;
+        private readonly ILogger<CategoryController> _logger;
 
-        public CategoryController(ICategoryRepository categoryRepository, IProductRepository productRepository)
+        public CategoryController(ICategoryRepository categoryRepository, IProductRepository productRepository, ILogger<CategoryController> logger)
         {
             _categoryRepository = categoryRepository;
             _productRepository = productRepository;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -27,17 +30,39 @@ namespace Buoi6.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
-            return View(new Category()); // Truyền model rỗng
+            _logger.LogInformation("Rendering Create view for Category");
+            return View(new Category());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create([Bind("Name")] Category category)
         {
+            _logger.LogInformation("Attempting to create category: {Name}", category.Name);
             if (ModelState.IsValid)
             {
-                await _categoryRepository.AddAsync(category);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _categoryRepository.AddAsync(category);
+                    _logger.LogInformation("Category created: {Name}", category.Name);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error creating category: {Name}", category.Name);
+                    ModelState.AddModelError("", "Lỗi khi thêm chủ đề: " + ex.Message);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("ModelState invalid for category: {Name}", category.Name);
+                foreach (var state in ModelState)
+                {
+                    foreach (var error in state.Value.Errors)
+                    {
+                        _logger.LogWarning("Field: {Key}, Error: {Message}", state.Key, error.ErrorMessage);
+                    }
+                }
             }
             return View(category);
         }
@@ -54,7 +79,7 @@ namespace Buoi6.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Category category)
+        public async Task<IActionResult> Edit([Bind("Id,Name")] Category category)
         {
             if (ModelState.IsValid)
             {

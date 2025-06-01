@@ -46,6 +46,21 @@
     color: #ffffff !important;
 }
 
+.btn-info {
+    background-color: #17a2b8 !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d !important;
+        color: #ffffff !important;
+    }
+
 .navbar-nav .nav-link.text-dark {
     color: #ffffff !important;
 }
@@ -57,3 +72,37 @@
     .navbar-dark .navbar-brand:hover {
         color: #cccccc;
     }
+
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.no-image {
+    border: 1px solid #dee2e6;
+}
+
+.badge {
+    font-size: 0.9rem;
+}
+
+.alert {
+    margin-bottom: 1rem;
+}
+
+.card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.img-thumbnail {
+    max-width: 100%;
+    height: auto;
+}

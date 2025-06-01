@@ -1,29 +1,40 @@
 ﻿@model IEnumerable<Buoi6.Models.Product>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Quản lý sản phẩm";
 }
 
-<h2>Quản lý sản phẩm</h2>
-<p><a asp-action="Create">Thêm sản phẩm</a></p>
-<table class="table">
+<h1>DANH SÁCH SẢN PHẨM</h1>
+
+<p>
+    <a asp-area="Admin" asp-controller="Product" asp-action="Create" class="btn btn-primary">Tạo mới</a>
+</p>
+<table class="table table-bordered">
     <thead>
         <tr>
-            <th>Tên</th>
-            <th>Giá</th>
-            <th>Chủ đề</th>
-            <th></th>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.Price)</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.ImageUrl)</th>
+            <th>@Html.DisplayNameFor(model => model.Category)</th>
+            <th>Thao tác</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var product in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@product.Name</td>
-                <td>@product.Price</td>
-                <td>@product.Category?.Name</td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@product.Id">Sửa</a> |
-                    <a asp-action="Delete" asp-route-id="@product.Id">Xóa</a>
+                    <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" width="100" alt="Product Image" />
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Chi tiết</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
                 </td>
             </tr>
         }
