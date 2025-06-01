@@ -1,10 +1,12 @@
 ﻿using Buoi6.Models;
 using Buoi6.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Buoi6.Controllers
 {
+    [Authorize] // Thêm attribute này để yêu cầu đăng nhập cho toàn bộ controller
     public class ProductController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;
@@ -167,7 +169,6 @@ namespace Buoi6.Controllers
             return allowedTypes.Contains(file.ContentType.ToLower());
         }
 
-        // Các method khác giữ nguyên...
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _productRepository.GetProductByIdAsync(id);
