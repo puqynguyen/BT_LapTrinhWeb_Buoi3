@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buoi5", "Buoi5\Buoi5.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buoi3", "Buoi3\Buoi3.csproj", "{084611EF-7F4A-4B2D-90BB-34083FF719F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Buoi6", "Buoi6\Buoi6.csproj", "{08C7B3E3-C548-4C2C-B6F2-37A70AC485EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buoi6", "Buoi6\Buoi6.csproj", "{08C7B3E3-C548-4C2C-B6F2-37A70AC485EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

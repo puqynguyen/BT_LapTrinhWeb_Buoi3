@@ -4,9 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Buoi6.Controllers
+namespace Buoi6.Areas.Controllers
 {
-    [Authorize] // Thêm attribute này để yêu cầu đăng nhập cho toàn bộ controller
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;

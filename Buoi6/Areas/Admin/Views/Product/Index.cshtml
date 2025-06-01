@@ -1,14 +1,10 @@
 ﻿@model IEnumerable<Buoi6.Models.Product>
 @{
-    ViewData["Title"] = "Sản phẩm";
+    ViewData["Title"] = "Quản lý sản phẩm";
 }
 
-<h2>Sản phẩm</h2>
-<form asp-action="Index" method="get">
-    <select name="categoryId" asp-items="ViewBag.Categories" onchange="this.form.submit()">
-        <option value="">Tất cả</option>
-    </select>
-</form>
+<h2>Quản lý sản phẩm</h2>
+<p><a asp-action="Create">Thêm sản phẩm</a></p>
 <table class="table">
     <thead>
         <tr>
@@ -25,7 +21,10 @@
                 <td>@product.Name</td>
                 <td>@product.Price</td>
                 <td>@product.Category?.Name</td>
-                <td><a asp-action="Details" asp-route-id="@product.Id">Chi tiết</a></td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@product.Id">Sửa</a> |
+                    <a asp-action="Delete" asp-route-id="@product.Id">Xóa</a>
+                </td>
             </tr>
         }
     </tbody>

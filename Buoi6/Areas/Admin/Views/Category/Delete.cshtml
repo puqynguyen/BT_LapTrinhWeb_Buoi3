@@ -1,0 +1,16 @@
+﻿@model Buoi6.Models.Category
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Xóa chủ đề";
+}
+
+<h2>Xóa chủ đề</h2>
+<h4>Bạn có chắc muốn xóa chủ đề <strong>@Model.Name</strong>?</h4>
+<p class="text-danger">Lưu ý: Tất cả sản phẩm thuộc chủ đề này cũng sẽ bị xóa.</p>
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger">Xóa</button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </div>
+</form>

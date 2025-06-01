@@ -1,0 +1,35 @@
+﻿@page
+@model Buoi6.Pages.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="text-center">
+    <h2>Chào mừng đến với Buoi6</h2>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <p>Xin chào, <strong>@User.Identity.Name</strong>!</p>
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="mb-3">
+                <h4>Quản trị viên</h4>
+                <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-primary m-1">Quản lý sản phẩm</a>
+                <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-primary m-1">Quản lý chủ đề</a>
+            </div>
+        }
+        <div class="mb-3">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary m-1">Xem sản phẩm</a>
+            <a asp-page="/Logout" class="btn btn-outline-danger m-1">Đăng xuất</a>
+        </div>
+    }
+    else
+    {
+        <p>Vui lòng đăng nhập hoặc đăng ký để tiếp tục.</p>
+        <div class="mb-3">
+            <a asp-page="/Login" class="btn btn-primary m-1">Đăng nhập</a>
+            <a asp-page="/Register" class="btn btn-success m-1">Đăng ký</a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary m-1">Xem sản phẩm</a>
+        </div>
+    }
+</div>

@@ -41,5 +41,9 @@ namespace Buoi6.Repository
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId)
+        {
+            return await _context.Products.Where(p => p.CategoryId == categoryId).ToListAsync();
+        }
     }
 }

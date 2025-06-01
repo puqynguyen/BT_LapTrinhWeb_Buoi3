@@ -2,25 +2,25 @@ using Buoi6.Models;
 using Buoi6.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Cấu hình file upload limits
+// File upload limits
 builder.Services.Configure<IISServerOptions>(options =>
 {
     options.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 
-// Cấu hình cho Kestrel server
 builder.Services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
 {
     options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 
-// Cấu hình form options
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
     options.ValueLengthLimit = int.MaxValue;
@@ -28,49 +28,63 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(optio
     options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
+// Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Repositories
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
-// Cập nhật Identity để sử dụng ApplicationUser
+// Identity configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    // Cấu hình password
     options.Password.RequiredLength = 6;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-
-    // Cấu hình user
     options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedAccount = false;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultUI()
 .AddDefaultTokenProviders();
 
+// Configure cookie authentication
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login";
+    options.AccessDeniedPath = "/AccessDenied";
+});
+
+// Enable Razor Pages
 builder.Services.AddRazorPages();
+
+// Add detailed logging
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.SetMinimumLevel(LogLevel.Debug);
+});
 
 var app = builder.Build();
 
-// Tạo roles và admin user
+// Create roles and users
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        await CreateRolesAndAdminUser(services);
+        await CreateRolesAndUsers(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Lỗi khi tạo roles và admin user");
+        logger.LogError(ex, "Error creating roles and users");
     }
 }
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -85,25 +99,20 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
-// Map areas
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
 
-// Method để tạo roles và admin user
-async Task CreateRolesAndAdminUser(IServiceProvider serviceProvider)
+async Task CreateRolesAndUsers(IServiceProvider serviceProvider)
 {
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-    // Tạo roles
     string[] roleNames = { "Admin", "Member" };
     foreach (var roleName in roleNames)
     {
@@ -113,10 +122,8 @@ async Task CreateRolesAndAdminUser(IServiceProvider serviceProvider)
         }
     }
 
-    // Tạo admin user
     var adminEmail = "admin@example.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
     if (adminUser == null)
     {
         adminUser = new ApplicationUser
@@ -127,7 +134,6 @@ async Task CreateRolesAndAdminUser(IServiceProvider serviceProvider)
             Address = "Địa chỉ Admin",
             EmailConfirmed = true
         };
-
         var result = await userManager.CreateAsync(adminUser, "Admin123!");
         if (result.Succeeded)
         {
@@ -135,10 +141,8 @@ async Task CreateRolesAndAdminUser(IServiceProvider serviceProvider)
         }
     }
 
-    // Tạo member user
     var memberEmail = "member@example.com";
     var memberUser = await userManager.FindByEmailAsync(memberEmail);
-
     if (memberUser == null)
     {
         memberUser = new ApplicationUser
@@ -149,7 +153,6 @@ async Task CreateRolesAndAdminUser(IServiceProvider serviceProvider)
             Address = "Địa chỉ Member",
             EmailConfirmed = true
         };
-
         var result = await userManager.CreateAsync(memberUser, "Member123!");
         if (result.Succeeded)
         {

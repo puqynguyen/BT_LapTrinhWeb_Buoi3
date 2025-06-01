@@ -1,0 +1,30 @@
+﻿@model IEnumerable<Buoi6.Models.Category>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Quản lý chủ đề";
+}
+
+<h2>Quản lý chủ đề</h2>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Thêm chủ đề mới</a>
+</p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tên chủ đề</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@category.Id" class="btn btn-sm btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
