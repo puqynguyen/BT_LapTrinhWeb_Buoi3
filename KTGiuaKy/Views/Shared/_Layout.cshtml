@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,8 +15,15 @@
             <nav>
                 <a asp-controller="SinhVien" asp-action="Index">Sinh Viên</a>
                 <a asp-controller="HocPhan" asp-action="Index">Học Phần</a>
-                <a asp-controller="DangKy" asp-action="Index">Đăng Ký</a>
-                <a asp-controller="Account" asp-action="Login">Đăng Nhập</a>
+                <a asp-controller="DangKy" asp-action="DangKyHocPhan">Đăng Ký</a>
+                @if (Context.Session.GetString("MaSV") != null)
+                {
+                    <a asp-controller="Account" asp-action="Logout">Đăng Xuất</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login">Đăng Nhập</a>
+                }
             </nav>
         </div>
     </header>

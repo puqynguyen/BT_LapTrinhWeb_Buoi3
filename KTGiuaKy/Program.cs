@@ -19,6 +19,15 @@ builder.Services.AddLogging(logging =>
     logging.AddDebug();
 });
 
+// Thêm dịch vụ Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,6 +40,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// Thêm middleware Session trước Authorization
+app.UseSession();
 app.UseAuthorization();
 app.UseRequestLocalization(new RequestLocalizationOptions
 {

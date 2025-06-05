@@ -29,7 +29,7 @@ namespace KTGiuaKy.Repositories
         }
 
         public void Update(SinhVien sinhVien)
-        {
+        {   
             _context.SinhViens.Update(sinhVien);
             _context.SaveChanges();
         }

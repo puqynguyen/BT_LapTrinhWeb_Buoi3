@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace KTGiuaKy.Controllers
 {
@@ -22,7 +25,66 @@ namespace KTGiuaKy.Controllers
             _environment = environment;
             _logger = logger;
         }
+        public IActionResult Login()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(string MaSV)
+        {
+            if (string.IsNullOrEmpty(MaSV))
+            {
+                TempData["Error"] = "Vui lòng nhập mã sinh viên.";
+                return View();
+            }
 
+            var sinhVien = _repository.GetById(MaSV);
+            if (sinhVien == null)
+            {
+                TempData["Error"] = "Mã sinh viên không tồn tại.";
+                return View();
+            }
+
+            try
+            {
+                // Tạo claims cho sinh viên
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, sinhVien.HoTen),
+                    new Claim("MaSV", sinhVien.MaSV)
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true, // Lưu cookie đăng nhập
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1) // Thời gian hết hạn
+                };
+
+                // Đăng nhập sử dụng cookie authentication
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
+
+                _logger.LogInformation("Sinh viên {MaSV} đăng nhập thành công", MaSV);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi đăng nhập sinh viên: {MaSV}", MaSV);
+                TempData["Error"] = "Có lỗi xảy ra khi đăng nhập.";
+                return View();
+            }
+        }
+
+        // GET: SinhVien/Logout
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            _logger.LogInformation("Đăng xuất thành công");
+            return RedirectToAction(nameof(Login));
+        }
         public IActionResult Index()
         {
             var sinhViens = _repository.GetAll();
@@ -42,13 +104,12 @@ namespace KTGiuaKy.Controllers
             {
                 MaNganhList = _context.NganhHocs
                     .Select(n => new SelectListItem { Value = n.MaNganh, Text = n.TenNganh })
-                    .ToList()
+                    .ToList() ?? new List<SelectListItem>()
             };
             if (!model.MaNganhList.Any())
             {
                 _logger.LogWarning("No NganhHoc found for SinhVien creation");
                 TempData["Error"] = "Không có ngành học nào được tìm thấy. Vui lòng tạo ngành học trước.";
-                return View(model);
             }
             return View(model);
         }
@@ -57,8 +118,17 @@ namespace KTGiuaKy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SinhVienViewModel model)
         {
-            _logger.LogInformation("Attempting to create SinhVien: {MaSV}, MaNganh: {MaNganh}, MainImage: {HasImage}",
-                model.MaSV, model.MaNganh, model.MainImage != null);
+            _logger.LogInformation("Form data: MaSV={MaSV}, MaNganh={MaNganh}, MainImage={MainImage}, FileSize={FileSize}, ContentType={ContentType}",
+                model.MaSV, model.MaNganh, model.MainImage?.FileName, model.MainImage?.Length, model.MainImage?.ContentType);
+
+            ModelState.Remove("MaNganhList");
+            ModelState.Remove("Hinh");
+
+            if (model.NgaySinh < new DateTime(1753, 1, 1))
+            {
+                ModelState.AddModelError("NgaySinh", "Ngày sinh không hợp lệ, phải sau 01/01/1753");
+                return await ReloadCreateView(model);
+            }
 
             if (ModelState.IsValid)
             {
@@ -73,7 +143,6 @@ namespace KTGiuaKy.Controllers
                         MaNganh = model.MaNganh
                     };
 
-                    // Kiểm tra MaNganh
                     var nganhHoc = await _context.NganhHocs.FindAsync(model.MaNganh);
                     if (nganhHoc == null)
                     {
@@ -81,7 +150,6 @@ namespace KTGiuaKy.Controllers
                         return await ReloadCreateView(model);
                     }
 
-                    // Xử lý MainImage
                     if (model.MainImage != null && model.MainImage.Length > 0)
                     {
                         if (!IsImageFile(model.MainImage))
@@ -161,6 +229,16 @@ namespace KTGiuaKy.Controllers
         public async Task<IActionResult> Edit(string id, SinhVienViewModel model)
         {
             if (id != model.MaSV) return NotFound();
+
+            ModelState.Remove("MaNganhList");
+            ModelState.Remove("Hinh");
+
+            if (model.NgaySinh < new DateTime(1753, 1, 1))
+            {
+                ModelState.AddModelError("NgaySinh", "Ngày sinh không hợp lệ, phải sau 01/01/1753");
+                return await ReloadEditView(id, model);
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -220,6 +298,18 @@ namespace KTGiuaKy.Controllers
                     TempData["Error"] = "Có lỗi xảy ra khi cập nhật sinh viên: " + ex.Message;
                 }
             }
+            else
+            {
+                _logger.LogWarning("ModelState invalid for SinhVien: {MaSV}", model.MaSV);
+                foreach (var state in ModelState)
+                {
+                    foreach (var error in state.Value.Errors)
+                    {
+                        _logger.LogWarning("Field: {Key}, Error: {Message}", state.Key, error.ErrorMessage);
+                    }
+                }
+                TempData["Error"] = "Vui lòng kiểm tra lại thông tin nhập vào.";
+            }
             return await ReloadEditView(id, model);
         }
 
@@ -255,9 +345,11 @@ namespace KTGiuaKy.Controllers
                 if (!Directory.Exists(imagesPath))
                 {
                     Directory.CreateDirectory(imagesPath);
+                    _logger.LogInformation("Created directory: {ImagesPath}", imagesPath);
                 }
-                var fileName = Guid.NewGuid().ToString() + "_" + image.FileName;
+                var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(image.FileName);
                 var savePath = Path.Combine(imagesPath, fileName);
+                _logger.LogInformation("Saving image to: {SavePath}", savePath);
                 using (var fileStream = new FileStream(savePath, FileMode.Create))
                 {
                     await image.CopyToAsync(fileStream);
@@ -292,7 +384,7 @@ namespace KTGiuaKy.Controllers
         {
             model.MaNganhList = _context.NganhHocs
                 .Select(n => new SelectListItem { Value = n.MaNganh, Text = n.TenNganh })
-                .ToList();
+                .ToList() ?? new List<SelectListItem>();
             return View(model);
         }
 
@@ -306,8 +398,9 @@ namespace KTGiuaKy.Controllers
 
         private bool IsImageFile(IFormFile file)
         {
-            var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif" };
-            return allowedTypes.Contains(file.ContentType.ToLower());
+            var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/heic" };
+            _logger.LogInformation("MainImage ContentType: {ContentType}", file?.ContentType);
+            return allowedTypes.Contains(file?.ContentType?.ToLower());
         }
     }
 }

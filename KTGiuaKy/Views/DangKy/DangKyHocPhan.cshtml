@@ -1,0 +1,80 @@
+﻿@model IEnumerable<KTGiuaKy.Models.HocPhan>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Đăng Ký Học Phần";
+}
+
+<div class="container">
+    <h2 class="text-center mb-4">ĐĂNG KÝ HỌC PHẦN</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form asp-action="DangKyHocPhan" method="post">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã Học Phần</th>
+                                <th>Tên Học Phần</th>
+                                <th>Số Tín Chỉ</th>
+                                <th>Chọn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var hocPhan in Model)
+                            {
+                                <tr>
+                                    <td>@hocPhan.MaHP</td>
+                                    <td>@hocPhan.TenHP</td>
+                                    <td>@hocPhan.SoTinChi</td>
+                                    <td>
+                                        <input type="checkbox" name="selectedHocPhans" value="@hocPhan.MaHP" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-save me-2"></i> Đăng Ký
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm">
+            <i class="fas fa-exclamation-circle me-2"></i> Không có học phần nào để đăng ký.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}
