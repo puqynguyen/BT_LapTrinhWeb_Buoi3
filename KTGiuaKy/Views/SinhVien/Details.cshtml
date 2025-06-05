@@ -1,0 +1,32 @@
+﻿@model KTGiuaKy.Models.SinhVien
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Details Sinh Viên</h2>
+<div>
+    <h4>SinhVien</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">MaSV</dt>
+        <dd class="col-sm-10">@Model.MaSV</dd>
+        <dt class="col-sm-2">HoTen</dt>
+        <dd class="col-sm-10">@Model.HoTen</dd>
+        <dt class="col-sm-2">GioiTinh</dt>
+        <dd class="col-sm-10">@Model.GioiTinh</dd>
+        <dt class="col-sm-2">NgaySinh</dt>
+        <dd class="col-sm-10">@Model.NgaySinh.ToShortDateString()</dd>
+        <dt class="col-sm-2">Hinh</dt>
+        <dd class="col-sm-10">
+            @if (!string.IsNullOrEmpty(Model.Hinh))
+            {
+                <img src="@Model.Hinh" alt="Hinh" style="width: 100px; height: auto;" />
+            }
+        </dd>
+        <dt class="col-sm-2">MaNganh</dt>
+        <dd class="col-sm-10">@Model.MaNganh</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.MaSV" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
