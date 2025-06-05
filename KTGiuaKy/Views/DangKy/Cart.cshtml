@@ -1,0 +1,81 @@
+﻿@model IEnumerable<KTGiuaKy.Models.HocPhan>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Giỏ Hàng";
+}
+
+<div class="container">
+    <h2 class="text-center mb-4">GIỎ HÀNG</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã Học Phần</th>
+                            <th>Tên Học Phần</th>
+                            <th>Số Tín Chỉ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var hocPhan in Model)
+                        {
+                            <tr>
+                                <td>@hocPhan.MaHP</td>
+                                <td>@hocPhan.TenHP</td>
+                                <td>@hocPhan.SoTinChi</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-end gap-2">
+                    <form asp-action="ConfirmCart" method="post">
+                        <button type="submit" class="btn btn-primary shadow-sm">
+                            <i class="fas fa-check me-2"></i> Xác Nhận Đăng Ký
+                        </button>
+                    </form>
+                    <form asp-action="ClearCart" method="post">
+                        <button type="submit" class="btn btn-danger shadow-sm">
+                            <i class="fas fa-trash me-2"></i> Xóa Giỏ Hàng
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm">
+            <i class="fas fa-exclamation-circle me-2"></i> Giỏ hàng trống.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}

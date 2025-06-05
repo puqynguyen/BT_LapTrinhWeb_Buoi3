@@ -14,8 +14,9 @@
             <h1>QUY</h1>
             <nav>
                 <a asp-controller="SinhVien" asp-action="Index">Sinh Viên</a>
-                <a asp-controller="HocPhan" asp-action="Index">Học Phần</a>
                 <a asp-controller="DangKy" asp-action="DangKyHocPhan">Đăng Ký</a>
+                <a asp-controller="DangKy" asp-action="Cart">Giỏ Hàng</a>
+                <a asp-controller="DangKy" asp-action="DaDangKy">Học Phần Đã Đăng Ký</a>
                 @if (Context.Session.GetString("MaSV") != null)
                 {
                     <a asp-controller="Account" asp-action="Logout">Đăng Xuất</a>

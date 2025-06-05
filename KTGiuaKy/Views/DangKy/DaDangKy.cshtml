@@ -1,0 +1,96 @@
+﻿@model IEnumerable<KTGiuaKy.Models.DangKy>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Học Phần Đã Đăng Ký";
+}
+
+<div class="container">
+    <h2 class="text-center mb-4">HỌC PHẦN ĐÃ ĐĂNG KÝ</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="mb-3">
+        <h5>Tổng số học phần: @ViewBag.TongHocPhan</h5>
+        <h5>Tổng số tín chỉ: @ViewBag.TongTinChi</h5>
+    </div>
+
+    @if (Model.Any() && Model.Any(dk => dk.ChiTietDangKys.Any()))
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã Học Phần</th>
+                            <th>Tên Học Phần</th>
+                            <th>Số Tín Chỉ</th>
+                            <th>Ngày Đăng Ký</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dangKy in Model)
+                        {
+                            @foreach (var chiTiet in dangKy.ChiTietDangKys)
+                            {
+                                <tr>
+                                    <td>@chiTiet.HocPhan.MaHP</td>
+                                    <td>@chiTiet.HocPhan.TenHP</td>
+                                    <td>@chiTiet.HocPhan.SoTinChi</td>
+                                    <td>@dangKy.NgayDK.ToString("dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                    <td>
+                                        <form asp-action="DeleteDangKy" method="post" style="display:inline;">
+                                            <input type="hidden" name="maDK" value="@dangKy.MaDK" />
+                                            <input type="hidden" name="maHP" value="@chiTiet.MaHP" />
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash me-2"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-end">
+                    <form asp-action="DeleteAllDangKy" method="post">
+                        <button type="submit" class="btn btn-danger shadow-sm">
+                            <i class="fas fa-trash-alt me-2"></i> Xóa Tất Cả
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm">
+            <i class="fas fa-exclamation-circle me-2"></i> Chưa có học phần nào được đăng ký.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}
