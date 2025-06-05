@@ -10,6 +10,16 @@ using System.Collections.Generic;
 
 namespace KTGiuaKy.Controllers
 {
+    public class HocPhanViewModel
+    {
+        public string MaHP { get; set; }
+        public string TenHP { get; set; }
+        public int SoTinChi { get; set; }
+        public int SoLuong { get; set; } // Số lượng sinh viên tối đa
+        public int SoLuongDuKien { get; set; } // Số lượng còn lại
+        public bool DaDangKy { get; set; }
+    }
+
     public class DangKyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -31,7 +41,24 @@ namespace KTGiuaKy.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var hocPhans = _context.HocPhans.ToList();
+            // Lấy danh sách học phần và tính số lượng sinh viên dự kiến
+            var daDangKy = _context.ChiTietDangKys
+                .Where(ct => ct.DangKy.MaSV == maSV)
+                .Select(ct => ct.MaHP)
+                .ToList();
+
+            var hocPhans = _context.HocPhans
+                .Select(hp => new HocPhanViewModel
+                {
+                    MaHP = hp.MaHP,
+                    TenHP = hp.TenHP,
+                    SoTinChi = hp.SoTinChi,
+                    SoLuong = hp.SoLuong,
+                    SoLuongDuKien = hp.SoLuong - _context.ChiTietDangKys.Count(ct => ct.MaHP == hp.MaHP),
+                    DaDangKy = daDangKy.Contains(hp.MaHP)
+                })
+                .ToList();
+
             return View(hocPhans);
         }
 
@@ -53,18 +80,32 @@ namespace KTGiuaKy.Controllers
                 return RedirectToAction(nameof(DangKyHocPhan));
             }
 
+            // Lấy danh sách học phần đã đăng ký
+            var daDangKy = _context.ChiTietDangKys
+                .Where(ct => ct.DangKy.MaSV == maSV)
+                .Select(ct => ct.MaHP)
+                .ToList();
+
             // Lấy giỏ hàng hiện tại từ session
             var cart = HttpContext.Session.GetString("Cart") != null
                 ? JsonSerializer.Deserialize<List<string>>(HttpContext.Session.GetString("Cart"))
                 : new List<string>();
 
-            // Thêm học phần mới vào giỏ hàng, tránh trùng lặp
+            // Thêm học phần mới vào giỏ hàng, tránh trùng lặp và đã đăng ký
+            var addedCount = 0;
             foreach (var maHP in selectedHocPhans)
             {
-                if (!cart.Contains(maHP) && _context.HocPhans.Any(hp => hp.MaHP == maHP))
+                if (!cart.Contains(maHP) && !daDangKy.Contains(maHP) && _context.HocPhans.Any(hp => hp.MaHP == maHP))
                 {
                     cart.Add(maHP);
+                    addedCount++;
                 }
+            }
+
+            if (addedCount == 0)
+            {
+                TempData["Error"] = "Tất cả học phần đã chọn đã được đăng ký hoặc không hợp lệ.";
+                return RedirectToAction(nameof(DangKyHocPhan));
             }
 
             // Lưu giỏ hàng vào session

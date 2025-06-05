@@ -15,5 +15,7 @@ namespace KTGiuaKy.Models
         public int SoTinChi { get; set; }
 
         public ICollection<ChiTietDangKy> ChiTietDangKys { get; set; }
+        [Range(0, 1000)]
+        public int SoLuong { get; set; }
     }
 }

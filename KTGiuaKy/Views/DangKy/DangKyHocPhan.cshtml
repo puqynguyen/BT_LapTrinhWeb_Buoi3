@@ -1,4 +1,4 @@
-﻿@model IEnumerable<KTGiuaKy.Models.HocPhan>
+﻿@model IEnumerable<KTGiuaKy.Controllers.HocPhanViewModel>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Đăng Ký Học Phần";
@@ -34,6 +34,8 @@
                                 <th>Mã Học Phần</th>
                                 <th>Tên Học Phần</th>
                                 <th>Số Tín Chỉ</th>
+                                <th>Số Lượng Tối Đa</th>
+                                <th>Số Lượng Còn Lại</th>
                                 <th>Chọn</th>
                             </tr>
                         </thead>
@@ -44,8 +46,17 @@
                                     <td>@hocPhan.MaHP</td>
                                     <td>@hocPhan.TenHP</td>
                                     <td>@hocPhan.SoTinChi</td>
+                                    <td>@hocPhan.SoLuong</td>
+                                    <td>@hocPhan.SoLuongDuKien</td>
                                     <td>
-                                        <input type="checkbox" name="selectedHocPhans" value="@hocPhan.MaHP" />
+                                        @if (hocPhan.DaDangKy)
+                                        {
+                                            <span class="text-muted"><i class="fas fa-check me-2"></i>Đã đăng ký</span>
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" name="selectedHocPhans" value="@hocPhan.MaHP" />
+                                        }
                                     </td>
                                 </tr>
                             }
