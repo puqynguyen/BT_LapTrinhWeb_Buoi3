@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buoi3", "Buoi3\Buoi3.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buoi6", "Buoi6\Buoi6.csproj", "{08C7B3E3-C548-4C2C-B6F2-37A70AC485EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KTGiuaKy", "KTGiuaKy\KTGiuaKy.csproj", "{E30B55A4-245A-4F8D-9166-5EE99F518A86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KTGiuaKy", "KTGiuaKy\KTGiuaKy.csproj", "{E30B55A4-245A-4F8D-9166-5EE99F518A86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

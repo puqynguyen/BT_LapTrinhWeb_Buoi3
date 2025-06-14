@@ -3,30 +3,238 @@
     ViewData["Title"] = "Sản phẩm";
 }
 
-<h2>Sản phẩm</h2>
-<form asp-action="Index" method="get">
-    <select name="categoryId" asp-items="ViewBag.Categories" onchange="this.form.submit()">
-        <option value="">Tất cả</option>
-    </select>
-</form>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Tên</th>
-            <th>Giá</th>
-            <th>Chủ đề</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model)
-        {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Price</td>
-                <td>@product.Category?.Name</td>
-                <td><a asp-action="Details" asp-route-id="@product.Id">Chi tiết</a></td>
-            </tr>
+<div class="container mt-4">
+    <h2>Sản phẩm</h2>
+
+    <!-- Category Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form asp-action="Index" method="get">
+                <div class="input-group">
+                    <select name="categoryId" asp-items="ViewBag.Categories" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tất cả danh mục</option>
+                    </select>
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-funnel"></i> Lọc
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="bi bi-info-circle-fill"></i> @TempData["Info"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var product in Model)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100">
+                        <div class="position-relative">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            }
+                            @if (product.Category != null)
+                            {
+                                <span class="badge bg-primary position-absolute top-0 start-0 m-2">@product.Category.Name</span>
+                            }
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text text-muted small flex-grow-1">@product.Description</p>
+                            <div class="mt-auto">
+                                <h4 class="text-danger mb-3">@product.Price.ToString("N0") VNĐ</h4>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-primary btn-sm flex-fill">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </a>
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <button type="button" class="btn btn-primary btn-sm flex-fill add-to-cart-btn"
+                                                data-product-id="@product.Id" data-product-name="@product.Name">
+                                            <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-page="/Login" class="btn btn-primary btn-sm flex-fill">
+                                            <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 5rem; color: #ccc;"></i>
+            <h4 class="mt-3">Không có sản phẩm nào</h4>
+            <p class="text-muted">Hiện tại chưa có sản phẩm nào trong danh mục này.</p>
+        </div>
+    }
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 mb-0">Đang thêm vào giỏ hàng...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add to cart functionality
+            document.querySelectorAll('.add-to-cart-btn').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault(); // Ngăn chặn hành vi mặc định
+                    const button = this;
+                    const productId = button.dataset.productId;
+                    const productName = button.dataset.productName;
+
+                    // Show loading modal
+                    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'), { backdrop: 'static', keyboard: false });
+                    loadingModal.show();
+
+                    // Disable button
+                    button.disabled = true;
+
+                    fetch('@Url.Action("AddToCart", "Home")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            productId: productId,
+                            quantity: 1
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingModal.hide();
+
+                        if (data.success) {
+                            // Show success message
+                            showToast('success', data.message);
+
+                            // Update cart count in navbar
+                            window.updateCartCount(data.itemCount);
+
+                            // Change button text temporarily
+                            const originalText = button.innerHTML;
+                            button.innerHTML = '<i class="bi bi-check"></i> Đã thêm';
+                            button.classList.remove('btn-primary');
+                            button.classList.add('btn-success');
+
+                            setTimeout(function () {
+                                button.innerHTML = originalText;
+                                button.classList.remove('btn-success');
+                                button.classList.add('btn-primary');
+                            }, 2000);
+                        } else {
+                            if (data.redirectToLogin) {
+                                window.location.href = '/Login';
+                            } else {
+                                showToast('error', data.message);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        loadingModal.hide();
+                        showToast('error', 'Có lỗi xảy ra. Vui lòng thử lại.');
+                    })
+                    .finally(() => {
+                        button.disabled = false;
+                    });
+                });
+            });
+
+            // Auto hide alerts
+            setTimeout(function () {
+                document.querySelectorAll('.alert').forEach(function (alert) {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+
+        function showToast(type, message) {
+            const toastType = type === 'success' ? 'success' : 'danger';
+            const icon = type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill';
+
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${toastType} border-0 position-fixed`;
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-${icon}"></i> ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+
+            toast.addEventListener('hidden.bs.toast', function () {
+                toast.remove();
+            });
         }
-    </tbody>
-</table>
+    </script>
+}

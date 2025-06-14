@@ -1,53 +1,120 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Buoi6</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Buoi6</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    @if (!User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
-                        </li>
-                    }
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Product" asp-action="Index">Quản lý sản phẩm</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Category" asp-action="Index">Quản lý danh mục</a>
-                        </li>
-                    }
-                </ul>
-                <partial name="_LoginPartial" />
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-shop"></i> Buoi6
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <!-- Menu chính được xử lý bởi ViewComponent -->
+                    </ul>
+
+                    <!-- Cart and User Menu -->
+                    @await Component.InvokeAsync("Navbar")
+                </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-    <footer class="border-top footer text-muted">
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top footer text-muted mt-5">
         <div class="container">
-            © 2025 - Buoi6 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row py-4">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-shop"></i> Buoi6 Store</h5>
+                    <p class="mb-1">Cửa hàng điện tử hàng đầu</p>
+                    <p class="mb-0">© 2025 - Buoi6 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Liên hệ</h6>
+                    <p class="mb-1"><i class="bi bi-telephone"></i> Hotline: 1900 1234</p>
+                    <p class="mb-1"><i class="bi bi-envelope"></i> Email: support@buoi6.com</p>
+                    <p class="mb-0"><i class="bi bi-geo-alt"></i> Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM</p>
+                </div>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Scripts -->
+    <!-- Giữ nguyên phần đầu và nội dung chính, chỉ sửa phần scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script>
+        // Fallback for jQuery
+        if (typeof jQuery === 'undefined') {
+            document.write('<script src="~/lib/jquery/dist/jquery.min.js"><\/script>');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fallback for Bootstrap
+        if (typeof bootstrap === 'undefined') {
+            document.write('<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"><\/script>');
+        }
+    </script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Initialize dropdowns -->
+    <script>
+        function initializeDropdowns() {
+            try {
+                const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+                console.log('Found dropdown elements:', dropdownElementList.length);
+
+                if (dropdownElementList.length === 0) {
+                    console.warn('No dropdown-toggle elements found in the DOM. Check NavbarViewComponent rendering.');
+                }
+
+                dropdownElementList.forEach(function (dropdownToggleEl, index) {
+                    try {
+                        new bootstrap.Dropdown(dropdownToggleEl);
+                        console.log(`Dropdown ${index + 1} initialized successfully`);
+                    } catch (error) {
+                        console.error(`Error initializing dropdown ${index + 1}:`, error);
+                    }
+                });
+            } catch (error) {
+                console.error('Error in dropdown initialization:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeDropdowns();
+
+            // Global function to update cart count
+            window.updateCartCount = function (count) {
+                const cartBadge = document.querySelector('.cart-count');
+                if (cartBadge) {
+                    cartBadge.textContent = count;
+                    cartBadge.style.display = count > 0 ? 'inline' : 'none';
+                    // Reinitialize dropdowns after updating navbar
+                    initializeDropdowns();
+                } else {
+                    console.warn('Cart count badge not found in the DOM');
+                }
+            };
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

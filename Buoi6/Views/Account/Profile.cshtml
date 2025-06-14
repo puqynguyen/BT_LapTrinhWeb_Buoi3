@@ -1,0 +1,16 @@
+﻿@model Buoi6.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Hồ sơ";
+}
+
+<div class="container mt-5">
+    <h2>Hồ sơ</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@Model.FullName</h5>
+            <p class="card-text"><strong>Email:</strong> @Model.Email</p>
+            <p class="card-text"><strong>Địa chỉ:</strong> @Model.Address</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Quay lại</a>
+        </div>
+    </div>
+</div>

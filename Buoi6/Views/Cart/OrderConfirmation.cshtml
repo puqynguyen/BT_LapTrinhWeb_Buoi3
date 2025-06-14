@@ -1,0 +1,116 @@
+﻿@model Buoi6.Models.Order
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Xác nhận đơn hàng";
+}
+
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+        <h2 class="text-success mt-3">Đặt hàng thành công!</h2>
+        <p class="text-muted">Cảm ơn bạn đã mua sắm tại cửa hàng chúng tôi.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-receipt"></i> Thông tin đơn hàng #@Model.Id
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Ngày đặt hàng:</strong><br>
+                            @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Trạng thái:</strong><br>
+                            <span class="badge bg-warning">@Model.Status</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Địa chỉ giao hàng:</strong><br>
+                        @Model.ShippingAddress
+                    </div>
+
+                    <h6 class="border-bottom pb-2 mb-3">Chi tiết sản phẩm</h6>
+
+                    @foreach (var detail in Model.OrderDetails)
+                    {
+                        <div class="row align-items-center mb-3 border-bottom pb-3">
+                            <div class="col-md-2">
+                                @if (!string.IsNullOrEmpty(detail.Product.ImageUrl))
+                                {
+                                    <img src="@detail.Product.ImageUrl" alt="@detail.Product.Name" class="img-fluid rounded" style="max-height: 60px;">
+                                }
+                                else
+                                {
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 60px;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-5">
+                                <h6 class="mb-1">@detail.Product.Name</h6>
+                                <small class="text-muted">Giá: @detail.Price.ToString("N0") VNĐ</small>
+                            </div>
+                            <div class="col-md-2">
+                                <span>Số lượng: @detail.Quantity</span>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <strong>@((detail.Price * detail.Quantity).ToString("N0")) VNĐ</strong>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-md-8"></div>
+                        <div class="col-md-4">
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tạm tính:</span>
+                                    <span>@Model.TotalAmount.ToString("N0") VNĐ</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Phí vận chuyển:</span>
+                                    <span class="text-success">Miễn phí</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <strong>Tổng cộng:</strong>
+                                    <strong class="text-danger">@Model.TotalAmount.ToString("N0") VNĐ</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-4">
+                <h6><i class="bi bi-info-circle"></i> Thông tin quan trọng</h6>
+                <ul class="mb-0">
+                    <li>Đơn hàng của bạn đang được xử lý và sẽ được giao trong vòng 2-3 ngày làm việc.</li>
+                    <li>Chúng tôi sẽ gửi thông báo qua email khi đơn hàng được giao.</li>
+                    <li>Bạn có thể theo dõi tình trạng đơn hàng trong mục "Đơn hàng của tôi".</li>
+                    <li>Thanh toán khi nhận hàng (COD).</li>
+                </ul>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-action="MyOrders" class="btn btn-primary">
+                    <i class="bi bi-list-ul"></i> Xem đơn hàng của tôi
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+                    <i class="bi bi-shop"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+}

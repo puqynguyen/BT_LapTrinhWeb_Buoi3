@@ -1,0 +1,105 @@
+﻿@model IEnumerable<Buoi6.Models.Order>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-list-ul"></i> Quản lý đơn hàng</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Any())
+    {
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Đơn hàng</th>
+                    <th>Người đặt</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Địa chỉ</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>#@order.Id</td>
+                        <td>@order.User?.FullName</td>
+                        <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@order.TotalAmount.ToString("N0") VNĐ</td>
+                        <td>@order.ShippingAddress</td>
+                        <td>
+                            @switch (order.Status)
+                            {
+                                case "Pending":
+                                    <span class="badge bg-warning">Chờ xử lý</span>
+                                    break;
+                                case "Delivered":
+                                    <span class="badge bg-success">Đã giao</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@order.Status</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> Chi tiết
+                            </a>
+                            @if (order.Status == "Pending")
+                            {
+                                <form asp-action="UpdateStatus" method="post" class="d-inline" onsubmit="return confirm('Xác nhận chuyển trạng thái đơn hàng #@order.Id thành Delivered?')">
+                                    <input type="hidden" name="orderId" value="@order.Id" />
+                                    <input type="hidden" name="status" value="Delivered" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-check-circle"></i> Hoàn thành
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 5rem; color: #ccc;"></i>
+            <h4 class="mt-3">Chưa có đơn hàng nào</h4>
+            <p class="text-muted">Hiện tại hệ thống chưa ghi nhận đơn hàng nào.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auto hide alerts
+            setTimeout(function () {
+                document.querySelectorAll('.alert').forEach(function (alert) {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+    </script>
+}

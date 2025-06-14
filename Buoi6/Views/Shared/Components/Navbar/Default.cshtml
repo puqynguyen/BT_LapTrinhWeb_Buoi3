@@ -1,0 +1,73 @@
+﻿@model Buoi6.Components.NavbarViewModel
+
+<ul class="navbar-nav ms-auto align-items-center">
+    @if (Model.IsAuthenticated)
+    {
+        @if (Model.IsAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Product" asp-action="Index">
+                    <i class="bi bi-box"></i> Quản lý sản phẩm
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Category" asp-action="Index">
+                    <i class="bi bi-tags"></i> Quản lý danh mục
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Admin" asp-controller="Order" asp-action="Index">
+                    <i class="bi bi-list-ul"></i> Quản lý đơn hàng
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-house"></i> Trang chủ
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
+                    <i class="bi bi-cart"></i> Giỏ hàng
+                    @if (Model.CartItemsCount > 0)
+                    {
+                        <span class="badge bg-danger cart-count">@Model.CartItemsCount</span>
+                    }
+                </a>
+            </li>
+        }
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person"></i> @User.Identity.Name
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">Hồ sơ</a></li>
+                @if (!Model.IsAdmin)
+                {
+                    <li><a class="dropdown-item" asp-area="" asp-controller="Cart" asp-action="MyOrders">Đơn hàng của tôi</a></li>
+                }
+                <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Đăng xuất</a></li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-house"></i> Trang chủ
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-page="/Login">
+                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-page="/Register">
+                <i class="bi bi-person-plus"></i> Đăng ký
+            </a>
+        </li>
+    }
+</ul>

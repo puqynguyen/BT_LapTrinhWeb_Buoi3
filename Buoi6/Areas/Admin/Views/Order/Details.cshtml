@@ -1,0 +1,137 @@
+﻿@model Buoi6.Models.Order
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-list-ul"></i> Chi tiết đơn hàng #@Model.Id</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <strong>Đơn hàng #@Model.Id</strong>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+                <div class="col-md-3">
+                    @switch (Model.Status)
+                    {
+                        case "Pending":
+                            <span class="badge bg-warning">Chờ xử lý</span>
+                            break;
+                        case "Delivered":
+                            <span class="badge bg-success">Đã giao</span>
+                            break;
+                        default:
+                            <span class="badge bg-secondary">@Model.Status</span>
+                            break;
+                    }
+                </div>
+                <div class="col-md-3 text-end">
+                    <strong class="text-danger">@Model.TotalAmount.ToString("N0") VNĐ</strong>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Người đặt:</strong> @Model.User?.FullName</p>
+                    <p class="mb-1"><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    @if (Model.Status == "Pending")
+                    {
+                        <form asp-action="UpdateStatus" method="post" class="d-inline" onsubmit="return confirm('Xác nhận chuyển trạng thái đơn hàng #@Model.Id thành Delivered?')">
+                            <input type="hidden" name="orderId" value="@Model.Id" />
+                            <input type="hidden" name="status" value="Delivered" />
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-check-circle"></i> Hoàn thành
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <h6>Chi tiết sản phẩm:</h6>
+                @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                {
+                    <div class="border-top pt-3">
+                        @foreach (var detail in Model.OrderDetails)
+                        {
+                            <div class="row align-items-center mb-2 border-bottom pb-2">
+                                <div class="col-md-2">
+                                    @if (!string.IsNullOrEmpty(detail.Product?.ImageUrl))
+                                    {
+                                        <img src="@detail.Product.ImageUrl" alt="@detail.Product.Name" class="img-fluid rounded" style="max-height: 50px;">
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 50px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-md-5">
+                                    <h6 class="mb-0">@detail.Product?.Name</h6>
+                                </div>
+                                <div class="col-md-2">
+                                    <span>SL: @detail.Quantity</span>
+                                </div>
+                                <div class="col-md-2">
+                                    <span>@detail.Price.ToString("N0") VNĐ</span>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <strong>@((detail.Price * detail.Quantity).ToString("N0")) VNĐ</strong>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Không có thông tin chi tiết sản phẩm.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auto hide alerts
+            setTimeout(function () {
+                document.querySelectorAll('.alert').forEach(function (alert) {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+    </script>
+}
